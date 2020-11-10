@@ -1,7 +1,9 @@
-import React from "react";
-import Link from "next/link";
-import Layout from "../components/_global/layout";
-
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
 export default function Home() {
-  return <Layout></Layout>;
+  const router = useRouter();
+  useEffect(() => {
+    router.push("/jackets");
+  }, []);
+  return null;
 }

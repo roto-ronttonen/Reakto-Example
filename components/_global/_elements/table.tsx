@@ -90,7 +90,7 @@ export default function Table({
     }
     let d = [...data];
     if (maxRows) {
-      d = d.splice(currPage * maxRows, currPage * maxRows + maxRows);
+      d = d.splice(currPage * maxRows, maxRows);
     }
     return d?.map((d, i) => (
       <tr key={d.id}>

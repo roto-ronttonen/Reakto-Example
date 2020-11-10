@@ -67,7 +67,7 @@ export default function Main({ data, loading }: MainProps) {
   return (
     <main>
       <FiltersForm loading={loading} filters={filters} onChange={setFilters} />
-      {process.browser && (
+      {process.browser && data && (
         <Table
           maxRows={50}
           loading={loading}
