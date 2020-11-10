@@ -2,14 +2,16 @@ import { forEach, orderBy } from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
 import { Product } from "../../../services/api-service";
 import FiltersForm, { ProductFilters } from "../../filters-form";
+import Button from "../_elements/button";
 import Table from "../_elements/table";
 
 type MainProps = {
-  data?: Product[];
-  loading?: boolean;
+  data: Product[];
+  loading: boolean;
+  refresh: (withErase?: boolean) => Promise<void>;
 };
 
-export default function Main({ data, loading }: MainProps) {
+export default function Main({ data, loading, refresh }: MainProps) {
   const [filters, setFilters] = useState<ProductFilters>({});
 
   const [sortBy, setSortBy] = useState<{
@@ -66,8 +68,11 @@ export default function Main({ data, loading }: MainProps) {
 
   return (
     <main>
+      <Button onClick={() => refresh(true)}>Refresh data</Button>
+      <div className="spacing" />
       <FiltersForm loading={loading} filters={filters} onChange={setFilters} />
-      {process.browser && data && (
+      <div className="spacing" />
+      {process.browser && (
         <Table
           maxRows={50}
           loading={loading}
@@ -80,6 +85,9 @@ export default function Main({ data, loading }: MainProps) {
       <style jsx>{`
         main {
           padding: 64px 16px;
+        }
+        .spacing {
+          height: 12px;
         }
       `}</style>
     </main>

@@ -56,7 +56,6 @@ type LastUpdated = number;
 
 interface ApiServiceProduct {
   products: Product[];
-  __lastUpdated__: LastUpdated;
 }
 
 interface ApiServiceContext {
@@ -66,9 +65,9 @@ interface ApiServiceContext {
 }
 
 const initialState = {
-  jackets: { products: null, __lastUpdated__: 0 },
-  shirts: { products: null, __lastUpdated__: 0 },
-  accessories: { products: null, __lastUpdated__: 0 },
+  jackets: { products: null },
+  shirts: { products: null },
+  accessories: { products: null },
 };
 
 export const ApiServiceContext = React.createContext<{
@@ -103,9 +102,6 @@ export const ApiServiceProvider = ({
     if (window && state) {
       try {
         const s = { ...state };
-        forEach(s, (value, key) => {
-          s[key].__lastUpdated = 0;
-        });
 
         window.sessionStorage.setItem(storageKey, JSON.stringify(s));
       } catch (e) {
@@ -150,12 +146,11 @@ export function useProdutList(category: Category) {
         const products = await defaultService.listProducts(category);
         if (mounted.current) {
           setData(products);
-          setState((s) => {
-            s[category].products = products;
-            s[category].__lastUpdated__ = Date.now();
-            return { ...s };
-          });
         }
+        setState((s) => {
+          s[category].products = products;
+          return { ...s };
+        });
       } catch (e) {
         if (mounted.current) {
           setError(e);
@@ -166,22 +161,19 @@ export function useProdutList(category: Category) {
     [category, setData, setError, setState]
   );
 
-  const init = useCallback(() => {
+  const init = useCallback(async () => {
     // if state set from there
     if (state[category].products) {
       if (mounted.current) {
         setData(state[category].products);
       }
     }
-    // If data is older than 30 sec revalidate
-    const shouldRevalidate =
-      Date.now() > state[category].__lastUpdated__ + 30000;
 
     // Check if should revalidate
-    if (state[category].products === null || shouldRevalidate) {
+    if (state[category].products === null) {
       f();
     }
-  }, [state, f]);
+  }, [mounted, setData, state, f]);
   useEffect(() => {
     mounted.current = true;
     init();

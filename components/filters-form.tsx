@@ -62,8 +62,13 @@ export default function FiltersForm({
           width: 100%;
         }
         .form-col {
-          padding: 12px;
           flex: 1 1 0;
+        }
+        .form-col:nth-child(even) {
+          padding-left: 12px;
+        }
+        .form-col:nth-child(odd) {
+          padding-right: 12px;
         }
       `}</style>
     </form>
