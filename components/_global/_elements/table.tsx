@@ -1,4 +1,5 @@
 import { flatten, isArray, mapKeys, uniq } from "lodash";
+import { on } from "process";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Loader from "./loader";
 
@@ -9,6 +10,7 @@ type TableData = {
 
 type TableProps = {
   data: TableData[];
+  onColClick?: (key: string) => void;
   // exampleRow can be used t render headers even without data
   exampleRow?: TableData;
   loading?: boolean;
@@ -49,6 +51,7 @@ export default function Table({
   exampleRow,
   loading,
   maxRows,
+  onColClick,
 }: TableProps) {
   // Used for pagination
   const [currPage, setCurrPage] = useState(0);
@@ -74,7 +77,9 @@ export default function Table({
     return (
       <tr>
         {headers.map((h, i) => (
-          <th key={h}>{h}</th>
+          <th key={h} onClick={onColClick ? () => onColClick(h) : null}>
+            {h}
+          </th>
         ))}
       </tr>
     );
@@ -90,7 +95,9 @@ export default function Table({
     return d?.map((d, i) => (
       <tr key={d.id}>
         {headers?.map((h) => (
-          <td key={h}>{formatDataToString(d[h])}</td>
+          <td key={h} onClick={onColClick ? () => onColClick(h) : null}>
+            {formatDataToString(d[h])}
+          </td>
         ))}
       </tr>
     ));
@@ -135,6 +142,7 @@ export default function Table({
           </button>
 
           <button
+            disabled={currPage === 0}
             className="pagination-controller"
             onClick={() => setCurrPage(0)}
           >
@@ -142,6 +150,7 @@ export default function Table({
           </button>
           <p className="pagination-current">{currPage + 1}</p>
           <button
+            disabled={currPage === numPages - 1}
             className="pagination-controller"
             onClick={() => setCurrPage(numPages - 1)}
           >

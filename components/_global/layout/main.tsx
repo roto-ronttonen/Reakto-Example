@@ -1,4 +1,4 @@
-import { forEach } from "lodash";
+import { forEach, orderBy } from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
 import { Product } from "../../../services/api-service";
 import FiltersForm, { ProductFilters } from "../../filters-form";
@@ -12,21 +12,57 @@ type MainProps = {
 export default function Main({ data, loading }: MainProps) {
   const [filters, setFilters] = useState<ProductFilters>({});
 
+  const [sortBy, setSortBy] = useState<{
+    property: string;
+    dir: "asc" | "desc";
+  }>(null);
+
   const filteredData = useMemo(() => {
     if (!data) {
       return null;
     }
-    if (!filters) {
-      return data;
-    }
+
     let d = [...data];
 
+    if (!filters) {
+      return d;
+    }
     forEach(filters, (value, key) => {
       d = d.filter((o) => o[key].toLowerCase().includes(value.toLowerCase()));
     });
 
     return d;
   }, [data, filters]);
+
+  const onColClick = useCallback(
+    (id: string) => {
+      setSortBy((s) => {
+        switch (id) {
+          case "id":
+          case "color":
+          case "category":
+            return s;
+          default: {
+            if (s && s.property === id) {
+              const nextDir = s.dir === "asc" ? "desc" : "asc";
+              return { ...s, dir: nextDir };
+            } else {
+              return { property: id, dir: "asc" };
+            }
+          }
+        }
+      });
+    },
+    [setSortBy]
+  );
+
+  const sortedAndFilteredData = useMemo(() => {
+    if (sortBy) {
+      const d = orderBy(filteredData, [sortBy.property], sortBy.dir);
+      return d;
+    }
+    return filteredData;
+  }, [sortBy, filteredData]);
 
   return (
     <main>
@@ -35,7 +71,8 @@ export default function Main({ data, loading }: MainProps) {
         <Table
           maxRows={50}
           loading={loading}
-          data={filteredData}
+          onColClick={onColClick}
+          data={sortedAndFilteredData}
           exampleRow={data ? data[0] : null}
         />
       )}
