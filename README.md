@@ -1,3 +1,5 @@
+Based on https://www.reaktor.com/junior-dev-assignment/
+
 App hosted at: https://reaktor-example.herokuapp.com/
 
 ---
